@@ -1,66 +1,76 @@
 # linux-whazzapp
 
-Lekki, nieoficjalny klient WhatsApp Web dla Ubuntu (Electron) w stylu ZapZap,
-z własną ikoną, zasobnikiem systemowym i automatycznym motywem jasnym/ciemnym.
+A light, unofficial WhatsApp Web client for Ubuntu (Electron) in the style of ZapZap,
+with its own icon, a system tray icon and an automatic light/dark theme.
 
 Created by: JGu  
 Supported by Claude
 
-**Wersja:** 1.2.1 · **Licencja:** MIT · **Platforma:** Ubuntu (GNOME), x86_64
+**Version:** 1.3.4 · **License:** MIT · **Platform:** Ubuntu (GNOME), x86_64
 
-> Projekt nie jest powiązany z WhatsApp ani Meta. Ikona jest własna i nie zawiera
-> logo WhatsApp. Aplikacja ładuje oficjalną stronę `web.whatsapp.com`, więc działa
-> tak długo, jak działa WhatsApp Web.
+> This project is not affiliated with WhatsApp or Meta. The icon is original and contains
+> no WhatsApp logo. The app loads the official `web.whatsapp.com` site, so it works as long
+> as WhatsApp Web works.
 
-## Funkcje
+## Features
 
-- **Zasobnik systemowy (tray):** zamknięcie okna chowa je do zasobnika, kliknięcie ikony
-  pokazuje lub ukrywa okno. Menu: zamykanie do tray, powiadomienia, autostart,
-  start zminimalizowany, motyw, przeładuj, zakończ.
-- **Powiadomienia systemowe** o nowych wiadomościach (nadawca i treść).
-- **Klik w powiadomienie otwiera okno i właściwą rozmowę.**
-- **Licznik nieprzeczytanych:** czerwona kropka na ikonie w tray, liczba w tooltipie
-  oraz licznik na ikonie w docku (o ile dock go obsługuje).
-- **Motyw automatyczny dzień/noc** zgodnie z ustawieniem Ubuntu, z ręcznym wyborem
-  w menu tray (Automatyczny / Jasny / Ciemny). Przełączenie w systemie działa na żywo.
-- **Ikony zależne od motywu:** ikona w tray i ikona aplikacji (menu, dock, okno)
-  mają wariant jasny i ciemny.
-- **Ruchomy podział** między listą czatów (lewo) a rozmową (prawo): przeciągnij pionową
-  krawędź listy czatów. Szerokość jest zapamiętywana, dwuklik na krawędzi przywraca domyślną.
-- **O programie** w menu tray: wersja i podpis autora.
-- **Autostart** z systemem (opcjonalnie, ukryty w tray).
-- Sprawdzanie pisowni PL/EN, menu kontekstowe, linki otwierane w przeglądarce systemowej.
-- Jedna instancja, sesja zapamiętana między uruchomieniami, kamera i mikrofon dla rozmów.
+- **System tray:** closing the window hides it to the tray, clicking the icon shows or hides
+  the window. Menu: close to tray, notifications, autostart, start minimized, theme, reload, quit.
+- **Desktop notifications** for new messages (sender and text).
+- **Clicking a notification opens the window and the right chat**, and the notification disappears.
+- **Read notifications disappear:** when you open a chat in the active window, that chat's
+  notifications are closed (also from the Ubuntu notification list). When the unread counter
+  drops to zero (for example after reading on your phone), all of them disappear.
+- **Photos and videos from iCloud Photos:** when `linux-icloud-photos` (version 0.14.0 or newer)
+  is installed, clicking "Photos & videos" in the attach menu asks "From iCloud Photos" /
+  "From computer" / "Cancel". The iCloud choice opens linux-icloud-photos in read-only mode;
+  you select photos and videos and click "Choose", and the files go into the open chat through
+  WhatsApp's normal preview screen, where you can add a caption before sending. A Live Photo is
+  sent as a still photo. HEIC photos are converted to JPEG.
+- **Unread counter:** a red dot on the tray icon, the number in the tooltip and a badge on the
+  dock icon (if your dock supports it).
+- **Automatic day/night theme** following the Ubuntu setting, with a manual choice in the tray
+  menu (Automatic / Light / Dark). Switching the system theme takes effect live.
+- **Theme-dependent icons:** the tray icon and the app icon (menu, dock, window) have a light
+  and a dark variant.
+- **Resizable divider** between the chat list (left) and the conversation (right): drag the
+  vertical edge of the chat list. The width is remembered, a double click on the edge restores
+  the default. In very narrow windows (below 760 px, when WhatsApp switches to a single
+  column) the divider switches itself off.
+- **About** in the tray menu: version and author credit.
+- **Autostart** with the system (optional, hidden in the tray).
+- Spell checking PL/EN, context menu, links open in the system browser.
+- Single instance, session remembered between runs, camera and microphone for calls.
 
-## Instalacja (Ubuntu)
+## Installation (Ubuntu)
 
-1. Pobierz `linux-whazzapp_1.2.1_amd64.deb`.
-2. Zainstaluj (apt dociągnie zależności). Najpierw skopiuj plik do `/tmp`, żeby apt
-   nie wypisywał ostrzeżenia o dostępie użytkownika `_apt`:
+1. Download `linux-whazzapp_1.3.4_amd64.deb`.
+2. Install it (apt pulls in the dependencies). Copy the file to `/tmp` first so apt does not
+   print a warning about the `_apt` user having no access:
    ```
-   cp ~/Pobrane/linux-whazzapp_1.2.1_amd64.deb /tmp/
-   sudo apt install /tmp/linux-whazzapp_1.2.1_amd64.deb
+   cp ~/Downloads/linux-whazzapp_1.3.4_amd64.deb /tmp/
+   sudo apt install /tmp/linux-whazzapp_1.3.4_amd64.deb
    ```
-3. Uruchom: wciśnij Super, wpisz „linux-whazzapp”, albo wpisz `linux-whazzapp` w terminalu.
-4. Zaloguj się: w telefonie WhatsApp → Ustawienia → Połączone urządzenia →
-   Połącz urządzenie i zeskanuj kod QR.
-5. Opcjonalnie: prawy przycisk na ikonie w tray → „Uruchamiaj z systemem”.
+3. Start it: press Super and type "linux-whazzapp", or run `linux-whazzapp` in a terminal.
+4. Sign in: on your phone open WhatsApp → Settings → Linked devices → Link a device and scan
+   the QR code.
+5. Optional: right-click the tray icon → start with the system.
 
-### Aktualizacja
+### Upgrading
 
-Zamknij aplikację (tray → Zakończ albo `pkill linux-whazzapp`) i zainstaluj nowszy plik tą samą
-komendą. Nie trzeba odinstalowywać starej wersji, a sesja (kod QR) zostaje.
+Quit the app (tray → Quit, or `pkill linux-whazzapp`) and install the newer file with the same
+command. You do not need to uninstall the old version, and the session (QR login) is kept.
 
-### Przejście ze starej nazwy (WhazzApp)
+### Moving from the old name (WhazzApp)
 
-Wersje do 1.2.0 nazywały się `whazzapp`. Instalacja `linux-whazzapp` zastępuje starą paczkę
-(apt usuwa ją sam), a przy pierwszym uruchomieniu aplikacja przenosi dotychczasową sesję
-i ustawienia do `~/.config/linux-whazzapp`, więc nie trzeba ponownie skanować kodu QR.
-Stare wpisy autostartu i ikony w katalogu użytkownika są usuwane. Jeśli po aktualizacji
-trzeba się zalogować ponownie, stary katalog z danymi mógł mieć inną nazwę niż zakładam
-(szukane są `~/.config/whazzapp` i `~/.config/WhazzApp`).
+Versions up to 1.2.0 were called `whazzapp`. Installing `linux-whazzapp` replaces the old package
+(apt removes it by itself), and on first start the app moves the existing session and settings
+to `~/.config/linux-whazzapp`, so you do not have to scan the QR code again. Old autostart
+entries and icons in the user directory are removed. If you have to sign in again after the
+upgrade, the old data folder may have had a different name than assumed (the app looks for
+`~/.config/whazzapp` and `~/.config/WhazzApp`).
 
-### Odinstalowanie
+### Uninstalling
 
 ```
 sudo apt remove linux-whazzapp
@@ -69,82 +79,108 @@ rm -f ~/.local/share/icons/hicolor/512x512/apps/linux-whazzapp.png
 rm -f ~/.config/autostart/linux-whazzapp.desktop
 ```
 
-`rm -rf ~/.config/linux-whazzapp` usuwa też zapamiętane logowanie, a dwie ostatnie linie
-sprzątają ikonę podmienianą przez aplikację i wpis autostartu.
+`rm -rf ~/.config/linux-whazzapp` also removes the saved login. The last two lines clean up the
+icon the app swaps and the autostart entry.
 
-## Budowanie ze źródeł
+## Building from source
 
-Wymagane: Node.js 18+ i npm.
+Requires Node.js 18+ and npm.
 
 ```
 npm install
-npm start          # uruchomienie w trybie testowym
-npm run dist       # dist/linux-whazzapp_1.2.1_amd64.deb + AppImage
+npm start          # run in test mode
+npm run dist       # dist/linux-whazzapp_1.3.4_amd64.deb + AppImage
 ```
 
-Gdy `electron-builder` kończy się błędem `Cannot read properties of null (reading 'channel')`,
-a plik `.deb` w `dist/` jest zapisany, to zawiodło tylko generowanie informacji o
-aktualizacjach. Sama paczka jest poprawna (`dpkg-deb -I dist/linux-whazzapp_1.2.1_amd64.deb`).
+If `electron-builder` ends with `Cannot read properties of null (reading 'channel')` but the
+`.deb` file is written to `dist/`, only the generation of update information failed. The package
+itself is fine (`dpkg-deb -I dist/linux-whazzapp_1.3.4_amd64.deb`).
 
-## Motyw i ikony
+## Theme and icons
 
-- Domyślnie motyw podąża za systemem (Ustawienia → Wygląd). Ręcznie: tray → Motyw.
-- W samym WhatsApp (Ustawienia → Motyw) ustaw „Domyślny systemu”, inaczej strona
-  zignoruje motyw aplikacji.
-- Ikona w tray: ciemna dymka z jasnozielonym ptaszkiem na ciemnym panelu, biała dymka
-  na jasnym. Przy nieprzeczytanych dochodzi czerwona kropka.
-- Ikona aplikacji jest podmieniana w `~/.local/share/icons/hicolor/512x512/apps/linux-whazzapp.png`.
-  Menu aplikacji (Activities) potrafi odświeżyć ją dopiero po chwili albo po ponownym
-  zalogowaniu.
-- Źródła ikon: `assets/icon.svg`, `assets/icon-dark.svg`, `assets/tray-*.svg`.
+- By default the theme follows the system (Settings → Appearance). Manually: tray → Theme.
+- In WhatsApp itself (Settings → Theme) choose "System default", otherwise the site ignores
+  the app theme.
+- Tray icon: a dark bubble with a light green handset on a dark panel, a white bubble on a
+  light one. A red dot is added when there are unread messages.
+- The app icon is swapped in `~/.local/share/icons/hicolor/512x512/apps/linux-whazzapp.png`.
+  The application menu (Activities) may refresh it only after a while or after you log in again.
+- Icon sources: `assets/icon.svg`, `assets/icon-dark.svg`, `assets/tray-*.svg`.
 
-## Rozwiązywanie problemów
+## Integration with linux-icloud-photos
 
-| Objaw | Co zrobić |
+Requirements: `linux-icloud-photos` 0.14.0+ (`.deb` or the Flatpak `local.linuxicloudphotos.Photos`),
+signed in to iCloud. The app checks this at start-up and every time the window is activated, so
+you do not need to restart it after installing. When linux-icloud-photos is missing or too old,
+"Photos & videos" works as before (the system file dialog).
+
+Step by step: open a chat → paperclip → "Photos & videos" → "From iCloud Photos" → select up to
+30 files → "Choose" → WhatsApp preview with the caption field → Send.
+The chosen files are stored temporarily in `~/.cache/linux-whazzapp/pick` and deleted after
+24 hours (WhatsApp reads them only when you send). The integration can be turned off in the tray
+menu. Advanced: the `WHAZZAPP_PHOTOS_CMD` variable points to a custom picker program.
+
+## Troubleshooting
+
+| Symptom | What to do |
 |---|---|
-| Brak ikony w górnym panelu | `sudo apt install gnome-shell-extension-appindicator`, potem wyloguj się i zaloguj. Bez tego „zamykanie do zasobnika” chowa okno bez łatwego powrotu, więc do czasu naprawy wyłącz tę opcję. |
-| Brak powiadomień | Sprawdź tryb „Nie przeszkadzać” w Ubuntu, przełącznik „Powiadomienia” w tray oraz Ustawienia → Powiadomienia w samym WhatsApp. |
-| Kliknięcie w powiadomienie tylko pokazuje okno | Otwieranie rozmowy opiera się na strukturze strony WhatsApp Web, którą Meta może zmienić. Zgłoś to, a selektory zostaną poprawione. |
-| Nie da się przeciągnąć podziału lista/rozmowa | Krawędź listy czatów podświetla się na zielono po najechaniu myszą. Jeśli jej nie ma, WhatsApp zmienił strukturę strony, a skrypt `assets/resizer.js` wymaga poprawki. Zgłoś to. |
-| Brak cyfry na ikonie w docku | Zależy od docka i od powiązania okna z wpisem `.desktop` (`desktopName` jest ustawione). Licznik widać też w tooltipie ikony w tray. |
-| Stara ikona w menu aplikacji | Wyloguj się i zaloguj, żeby odświeżyć cache ikon. |
-| Strona prosi o aktualizację przeglądarki | Aplikacja podaje się za Chrome o wersji dołączonego silnika. Zaktualizuj linux-whazzapp do nowszej wersji. |
+| No icon in the top panel | `sudo apt install gnome-shell-extension-appindicator`, then log out and in. Without it "close to tray" hides the window with no easy way back, so turn that option off until it is fixed. |
+| No notifications | Check Ubuntu's Do Not Disturb mode, the "Notifications" switch in the tray and Settings → Notifications inside WhatsApp. |
+| Clicking a notification only shows the window | Opening the chat relies on the structure of the WhatsApp Web page, which Meta may change. Report it and the selectors will be fixed. |
+| A notification does not disappear | Make sure version 1.3.x is running (tray → About); after installing, quit the app from the tray and start it again. Recognising the open chat relies on the WhatsApp page header; if Meta changes it, closing on click and when the counter reaches zero still works. |
+| The chat list / conversation divider cannot be dragged | The edge of the chat list turns green on mouse-over. If it does not, WhatsApp changed the page structure and `assets/resizer.js` needs a fix. Report it. In windows narrower than 760 px the divider is switched off on purpose. |
+| "Photos & videos" does not ask about iCloud | Check that `linux-icloud-photos` is version 0.14.0+ (`dpkg -s linux-icloud-photos`) and that the iCloud Photos option in the tray menu is on. If WhatsApp changed the attach menu, the app falls back to the normal file dialog. |
+| Nothing happens after "Choose" | Open a chat first. Photos are passed to the field WhatsApp opened when you clicked; if you switch chats while choosing, choose again. |
+| No number on the dock icon | Depends on the dock and on the window being tied to the `.desktop` entry (`desktopName` is set). The counter is also visible in the tray icon tooltip. |
+| Old icon in the application menu | Log out and in to refresh the icon cache. |
+| The page asks to update the browser | The app identifies itself as Chrome of the bundled engine's version. Update linux-whazzapp to a newer version. |
 
-## Ograniczenia
+## Limitations
 
-- Licznik nieprzeczytanych bierze się z tytułu strony, np. „(3) WhatsApp”. Zlicza więc
-  rozmowy, nie pojedyncze wiadomości, i pomija wyciszone czaty. Tak samo liczy WhatsApp
-  w przeglądarce.
-- Ikona w tray w standardowym GNOME nie pokazuje cyfry, tylko kropkę.
-- Ruchomy podział działa na zasadzie wyszukania lewej kolumny w stronie WhatsApp Web
-  (przez `#side`), więc może przestać działać po zmianie układu strony przez Meta.
-- Otwieranie rozmowy po kliknięciu w powiadomienie i podmiana ikony aplikacji przy
-  zmianie motywu są nowe i mogą wymagać poprawek na różnych wersjach Ubuntu.
+- The unread counter comes from the page title, e.g. "(3) WhatsApp". It therefore counts chats,
+  not single messages, and skips muted chats. WhatsApp counts the same way in a browser.
+- The tray icon in standard GNOME shows a dot, not a number.
+- The resizable divider finds the left column in the WhatsApp Web page (through `#side`), so it
+  may stop working if Meta changes the page layout.
+- Opening the chat after clicking a notification, closing read notifications and swapping the
+  app icon on theme change are new and may need fixes on different Ubuntu versions.
 
-## Pliki
+## Files
 
 ```
-main.js            logika aplikacji (okno, tray, powiadomienia, motyw, o programie)
-assets/            ikony aplikacji i tray (SVG + PNG, warianty jasny/ciemny)
-assets/resizer.js  ruchomy podział lista czatów / rozmowa (wstrzykiwany do strony)
-build/icon.png     ikona używana przez electron-builder
-package.json       metadane i konfiguracja paczki .deb / AppImage
+main.js                logic of the app (window, tray, notifications, theme, about)
+assets/                app and tray icons (SVG + PNG, light and dark variants)
+assets/notify-hook.js  notifications: click opens the chat, read ones disappear
+assets/photos-hook.js  intercepts "Photos & videos" in the attach menu
+assets/resizer.js      resizable chat list / conversation divider (injected into the page)
+photos.js              linux-icloud-photos integration (detection, --pick mode, passing files)
+test/                  unit tests (node --test test/photos.test.js)
+build/icon.png         icon used by electron-builder
+package.json           metadata and the .deb / AppImage package configuration
 ```
 
-Dane użytkownika: `~/.config/linux-whazzapp` (sesja i `settings.json`).
+User data: `~/.config/linux-whazzapp` (session and `settings.json`).
 
-## Historia zmian
+## Version history
 
-- **1.2.1** zmiana nazwy na **linux-whazzapp** (jak reszta serii), migracja sesji ze starej nazwy
-- **1.2.0** ruchomy podział lista czatów / rozmowa, „O programie” z podpisem
-  „Created by: JGu / Supported by Claude”
-- **1.1.5** ikona aplikacji zależna od motywu, klik w powiadomienie otwiera rozmowę
-- **1.1.4** ciemny wariant ikony w tray (ciemna dymka)
-- **1.1.3** ikona w tray taka sama jak aplikacji, warianty jasny/ciemny
-- **1.1.2** usunięta czerwona kropka z ikony aplikacji, `desktopName`
-- **1.1.1** zmiana nazwy na WhazzApp
-- **1.1.0** automatyczny motyw dzień/noc
-- **1.0.0** pierwsza wersja: tray, powiadomienia, autostart
+- **1.3.4** fix: the stripe left behind after shrinking the chat list (the divider now moves WhatsApp's own
+  divider line together with the list)
+- **1.3.3 / 1.3.2** tray item "Layout diagnostics" (copies a description of the page layout to the clipboard)
+- **1.3.1** fix: in a very narrow window a leftover stripe of the resizable divider remained
+  (the divider now switches off below 760 px width)
+- **1.3.0** photos and videos from iCloud Photos (linux-icloud-photos 0.14.0+) in the attach
+  menu, notifications disappear after reading or clicking
+- **1.2.1** renamed to **linux-whazzapp** (like the rest of the series), session migration from
+  the old name
+- **1.2.0** resizable chat list / conversation divider, "About" with the credit
+  "Created by: JGu / Supported by Claude"
+- **1.1.5** theme-dependent app icon, clicking a notification opens the chat
+- **1.1.4** dark tray icon variant (dark bubble)
+- **1.1.3** tray icon the same as the app icon, light/dark variants
+- **1.1.2** red dot removed from the app icon, `desktopName`
+- **1.1.1** renamed to WhazzApp
+- **1.1.0** automatic day/night theme
+- **1.0.0** first version: tray, notifications, autostart
 
 ---
 
