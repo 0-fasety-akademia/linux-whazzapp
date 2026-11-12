@@ -1,0 +1,61 @@
+name: Release
+
+# Pushing a tag such as v1.3.5 builds the .deb from src/ with electron-builder
+# and publishes it, together with a source archive, as a GitHub Release.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Check that the tag matches package.json
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          if [ "${GITHUB_REF_NAME}" != "v${VERSION}" ]; then
+            echo "Tag ${GITHUB_REF_NAME} does not match package.json (${VERSION})"; exit 1
+          fi
+          echo "VERSION=${VERSION}" >> "$GITHUB_ENV"
+
+      - name: Install the locked dependencies
+        run: npm ci
+
+      - name: Unit tests
+        run: node --test test/photos.test.js
+
+      - name: Build the package
+        run: npx electron-builder --linux deb --publish never
+
+      - name: Collect release files
+        run: |
+          mkdir -p ../release
+          DEB=dist/linux-whazzapp_${VERSION}_amd64.deb
+          dpkg-deb -f "$DEB" Package Version Architecture
+          [ "$(dpkg-deb -f "$DEB" Version)" = "${VERSION}" ] || { echo "Package version differs from the tag"; exit 1; }
+          dpkg-deb -c "$DEB" | grep -q '/opt/linux-whazzapp/LICENSE$' || { echo "LICENSE missing from the package"; exit 1; }
+          cp "$DEB" ../release/
+          git -C .. archive --format=zip --prefix=linux-whazzapp-${VERSION}/ \
+            -o "release/linux-whazzapp-${VERSION}-source.zip" HEAD:src
+          ls -la ../release
+
+      - name: Publish the release
+        working-directory: .
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" release/* \
+            --title "linux-whazzapp ${VERSION}" \
+            --notes "Install: \`sudo apt install ./$(basename release/*.deb)\`. Changes: see the version history in README.md."

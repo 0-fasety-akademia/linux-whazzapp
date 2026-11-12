@@ -6,7 +6,7 @@ with its own icon, a system tray icon and an automatic light/dark theme.
 Created by: JGu  
 Supported by Claude
 
-**Version:** 1.3.4 · **License:** MIT · **Platform:** Ubuntu (GNOME), x86_64
+**Version:** 1.3.5 · **License:** Freeware License (No Modifications), see `LICENSE` · **Platform:** Ubuntu (GNOME), x86_64
 
 > This project is not affiliated with WhatsApp or Meta. The icon is original and contains
 > no WhatsApp logo. The app loads the official `web.whatsapp.com` site, so it works as long
@@ -166,6 +166,7 @@ User data: `~/.config/linux-whazzapp` (session and `settings.json`).
 
 ## Version history
 
+- **1.3.5** license: the app is now published under the Freeware License (No Modifications), see `LICENSE`; free to use and share unmodified, modification is not permitted. No other changes in the app.
 - **1.3.4** fix: the stripe left behind after shrinking the chat list (the divider now moves WhatsApp's own
   divider line together with the list)
 - **1.3.3 / 1.3.2** tray item "Layout diagnostics" (copies a description of the page layout to the clipboard)
