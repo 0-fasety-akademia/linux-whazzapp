@@ -44,12 +44,12 @@ Supported by Claude
 
 ## Installation (Ubuntu)
 
-1. Download `linux-whazzapp_1.3.4_amd64.deb`.
+1. Download the newest `linux-whazzapp_<version>_amd64.deb` from the [Releases page](https://github.com/jgu-linux-apps/linux-whazzapp/releases/latest).
 2. Install it (apt pulls in the dependencies). Copy the file to `/tmp` first so apt does not
    print a warning about the `_apt` user having no access:
    ```
-   cp ~/Downloads/linux-whazzapp_1.3.4_amd64.deb /tmp/
-   sudo apt install /tmp/linux-whazzapp_1.3.4_amd64.deb
+   cp ~/Downloads/linux-whazzapp_<version>_amd64.deb /tmp/
+   sudo apt install /tmp/linux-whazzapp_<version>_amd64.deb
    ```
 3. Start it: press Super and type "linux-whazzapp", or run `linux-whazzapp` in a terminal.
 4. Sign in: on your phone open WhatsApp → Settings → Linked devices → Link a device and scan
@@ -84,17 +84,18 @@ icon the app swaps and the autostart entry.
 
 ## Building from source
 
-Requires Node.js 18+ and npm.
+The source code is in the `src/` folder of this repository; the `.deb` packages are not kept in git but
+attached to [GitHub Releases](https://github.com/jgu-linux-apps/linux-whazzapp/releases). Requires Node.js 18+ and npm. Run inside `src/`:
 
 ```
 npm install
 npm start          # run in test mode
-npm run dist       # dist/linux-whazzapp_1.3.4_amd64.deb + AppImage
+npm run dist       # dist/linux-whazzapp_<version>_amd64.deb + AppImage
 ```
 
 If `electron-builder` ends with `Cannot read properties of null (reading 'channel')` but the
 `.deb` file is written to `dist/`, only the generation of update information failed. The package
-itself is fine (`dpkg-deb -I dist/linux-whazzapp_1.3.4_amd64.deb`).
+itself is fine (`dpkg-deb -I dist/linux-whazzapp_<version>_amd64.deb`).
 
 ## Theme and icons
 
@@ -146,6 +147,8 @@ menu. Advanced: the `WHAZZAPP_PHOTOS_CMD` variable points to a custom picker pro
   app icon on theme change are new and may need fixes on different Ubuntu versions.
 
 ## Files
+
+Paths relative to `src/`:
 
 ```
 main.js                logic of the app (window, tray, notifications, theme, about)

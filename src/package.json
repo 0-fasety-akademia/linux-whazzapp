@@ -1,0 +1,63 @@
+{
+  "name": "linux-whazzapp",
+  "productName": "linux-whazzapp",
+  "version": "1.3.4",
+  "description": "Lekki klient WhatsApp Web dla Ubuntu: tray, powiadomienia, autostart, motyw jasny/ciemny",
+  "main": "main.js",
+  "desktopName": "linux-whazzapp.desktop",
+  "author": {
+    "name": "Jaro",
+    "email": "jaro@localhost"
+  },
+  "homepage": "https://example.com/linux-whazzapp",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --linux deb AppImage"
+  },
+  "devDependencies": {
+    "electron": "^37.0.0",
+    "electron-builder": "^26.0.0"
+  },
+  "build": {
+    "appId": "dev.jaro.linux-whazzapp",
+    "productName": "linux-whazzapp",
+    "icon": "build/icon.png",
+    "files": [
+      "main.js",
+      "photos.js",
+      "assets/**"
+    ],
+    "linux": {
+      "category": "Network",
+      "target": [
+        "deb",
+        "AppImage"
+      ],
+      "executableName": "linux-whazzapp",
+      "maintainer": "Jaro <jaro@localhost>",
+      "syncDesktopName": true,
+      "desktop": {
+        "entry": {
+          "Name": "linux-whazzapp",
+          "Comment": "WhatsApp Web na pulpicie",
+          "Categories": "Network;InstantMessaging;Chat;",
+          "StartupWMClass": "linux-whazzapp",
+          "Keywords": "whatsapp;chat;messenger;"
+        }
+      }
+    },
+    "deb": {
+      "depends": [
+        "libnotify4",
+        "libappindicator3-1"
+      ],
+      "fpm": [
+        "--replaces",
+        "whazzapp",
+        "--conflicts",
+        "whazzapp"
+      ]
+    }
+  }
+}
