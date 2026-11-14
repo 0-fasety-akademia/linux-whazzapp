@@ -1,55 +1,69 @@
 /* linux-whazzapp: motyw „Aurora” (wspólny wygląd serii JGu Linux Apps) dla WhatsApp Web.
-   Zmieniamy WYŁĄCZNIE zmienne kolorów WhatsAppa (bez klas i układu), więc aktualizacja strony najwyżej
-   sprawi, że część elementów wróci do zwykłych kolorów — nic się nie rozjedzie.
-   Zmienne ustawiamy na każdym elemencie z !important: wygrywają tam, gdzie WhatsApp je definiuje.
-   Jasny/ciemny: WhatsApp dodaje klasę .dark do <body>, gdy system jest ciemny. */
-body:not(.dark), body:not(.dark) * {
-  --app-background: #f4f1ff !important;
-  --app-background-deeper: #e6e1fa !important;
-  --app-background-stripe: #7c5cff !important;
-  --WDS-app-wash: #ebe6ff !important;
-  --panel-background: #f3f0ff !important;
-  --panel-background-deep: #ece8fb !important;
-  --panel-header-background: #f6f3ff !important;
-  --panel-input-background: #ece8fb !important;
-  --background-default: #fbfaff !important;
-  --background-default-hover: #f1edff !important;
-  --background-default-active: #e9e3ff !important;
-  --conversation-panel-background: #f7f4ff !important;
-  --intro-background: #f7f4ff !important;
-  --navbar-background: #efeaff !important;
-  --search-input-background: #ece8fb !important;
-  --compose-input-background: #ffffff !important;
-  --outgoing-background: #e6ddff !important;
-  --incoming-background: #ffffff !important;
-  --icon-high-emphasis: #7c5cff !important;
-  --icon-primary: #7c5cff !important;
-  --unread-marker-background: #7c5cff !important;
-  --button-primary-background: #7c5cff !important;
-  --chip-button-background: #e6ddff !important;
+   Zmieniamy WYŁĄCZNIE kolory systemu projektowego WhatsAppa (zmienne --WDS-*), bez klas i układu, więc
+   aktualizacja strony najwyżej sprawi, że część elementów wróci do zwykłych kolorów — nic się nie rozjedzie.
+   Zmienne ustawiamy na każdym elemencie z !important: wygrywają z wartościami, które WhatsApp ustawia na <html>.
+   Warianty *-RGB (używane do przezroczystości) zostają WhatsAppa: ich format nie jest pewny.
+   Jasny/ciemny: według systemu (prefers-color-scheme), więc w WhatsAppie motyw ma być „Domyślny systemowy”.
+   Kolor tekstu też ustawiamy, żeby zawsze pasował do tła, nawet gdy motyw WhatsAppa jest inny niż systemu. */
+html, html * {
+  --WDS-surface-default: #fbfaff !important;
+  --WDS-surface-elevated-default: #ffffff !important;
+  --WDS-surface-elevated-emphasized: #f3f0ff !important;
+  --WDS-surface-emphasized: #ece8fb !important;
+  --WDS-surface-highlight: #f1edff !important;
+  --WDS-surface-pressed: #e9e3ff !important;
+  --WDS-background-wash-plain: #f4f1ff !important;
+  --WDS-background-wash-inset: #ece8fb !important;
+  --WDS-background-elevated-wash-plain: #f6f3ff !important;
+  --WDS-background-elevated-wash-inset: #ece8fb !important;
+  --WDS-components-surface-nav-bar: #efeaff !important;
+  --WDS-components-filter-surface-selected: #e6ddff !important;
+  --WDS-accent: #7c5cff !important;
+  --WDS-accent-emphasized: #6a48f0 !important;
+  --WDS-accent-deemphasized: #e6ddff !important;
+  --WDS-content-action-emphasized: #7c5cff !important;
+  --WDS-content-on-accent: #ffffff !important;
+  --WDS-systems-bubble-surface-outgoing: #e6ddff !important;
+  --WDS-systems-bubble-surface-incoming: #ffffff !important;
+  --WDS-systems-chat-background-wallpaper: #f7f4ff !important;
+  --WDS-systems-chat-foreground-wallpaper: #e6e1fa !important;
+  --WDS-systems-chat-surface-composer: #ffffff !important;
+  --WDS-systems-chat-surface-tray: #f6f3ff !important;
+  --WDS-lines-divider: #e2dcfa !important;
+  --WDS-lines-outline-deemphasized: #e2dcfa !important;
+  --WDS-content-default: #1f1a3a !important;
+  --WDS-content-deemphasized: #6b6590 !important;
+  --WDS-systems-bubble-content-deemphasized: #6b6590 !important;
 }
-body.dark, body.dark *, html.dark body, html.dark body * {
-  --app-background: #0c0e1a !important;
-  --app-background-deeper: #070912 !important;
-  --app-background-stripe: #2a1f55 !important;
-  --WDS-app-wash: #0a0c18 !important;
-  --panel-background: #12152a !important;
-  --panel-background-deep: #0f1224 !important;
-  --panel-header-background: #14172b !important;
-  --panel-input-background: #1a1e36 !important;
-  --background-default: #0e1020 !important;
-  --background-default-hover: #171b33 !important;
-  --background-default-active: #1e2342 !important;
-  --conversation-panel-background: #0b0d1a !important;
-  --intro-background: #0e1020 !important;
-  --navbar-background: #0e1124 !important;
-  --search-input-background: #1a1e36 !important;
-  --compose-input-background: #1a1e36 !important;
-  --outgoing-background: #3b2a75 !important;
-  --incoming-background: #1a1e36 !important;
-  --icon-high-emphasis: #22d3ee !important;
-  --icon-primary: #a855f7 !important;
-  --unread-marker-background: #a855f7 !important;
-  --button-primary-background: #8b5cf6 !important;
-  --chip-button-background: #2a2150 !important;
+@media (prefers-color-scheme: dark) {
+  html, html * {
+    --WDS-surface-default: #0e1020 !important;
+    --WDS-surface-elevated-default: #14172a !important;
+    --WDS-surface-elevated-emphasized: #1a1e36 !important;
+    --WDS-surface-emphasized: #1a1e36 !important;
+    --WDS-surface-highlight: #171b33 !important;
+    --WDS-surface-pressed: #1e2342 !important;
+    --WDS-background-wash-plain: #0c0e1a !important;
+    --WDS-background-wash-inset: #0a0c18 !important;
+    --WDS-background-elevated-wash-plain: #12152a !important;
+    --WDS-background-elevated-wash-inset: #0f1224 !important;
+    --WDS-components-surface-nav-bar: #0e1124 !important;
+    --WDS-components-filter-surface-selected: #2a2150 !important;
+    --WDS-accent: #a855f7 !important;
+    --WDS-accent-emphasized: #c084fc !important;
+    --WDS-accent-deemphasized: #2a2150 !important;
+    --WDS-content-action-emphasized: #c084fc !important;
+    --WDS-content-on-accent: #ffffff !important;
+    --WDS-systems-bubble-surface-outgoing: #3b2a75 !important;
+    --WDS-systems-bubble-surface-incoming: #1a1e36 !important;
+    --WDS-systems-chat-background-wallpaper: #0b0d1a !important;
+    --WDS-systems-chat-foreground-wallpaper: #161a30 !important;
+    --WDS-systems-chat-surface-composer: #1a1e36 !important;
+    --WDS-systems-chat-surface-tray: #12152a !important;
+    --WDS-lines-divider: #252a45 !important;
+    --WDS-lines-outline-deemphasized: #252a45 !important;
+    --WDS-content-default: #ecebff !important;
+    --WDS-content-deemphasized: #a3a1c8 !important;
+    --WDS-systems-bubble-content-deemphasized: #a3a1c8 !important;
+  }
 }
