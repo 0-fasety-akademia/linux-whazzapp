@@ -46,9 +46,27 @@ const saveSettings = () => {
 };
 
 // motyw: 'system' = automatyczny dzień/noc zgodnie z ustawieniem Ubuntu
-if (!['system', 'light', 'dark'].includes(settings.theme)) settings.theme = 'system';
-nativeTheme.themeSource = settings.theme;
-const bgColor = () => (nativeTheme.shouldUseDarkColors ? '#111b21' : '#f0f2f5');
+if (!['system', 'light', 'dark', 'aurora'].includes(settings.theme)) settings.theme = 'system';
+// Aurora jasna/ciemna idzie za systemem, więc dla Electrona to „system”
+const themeSource = () => (settings.theme === 'aurora' ? 'system' : settings.theme);
+nativeTheme.themeSource = themeSource();
+const bgColor = () => (settings.theme === 'aurora'
+  ? (nativeTheme.shouldUseDarkColors ? '#0c0e1a' : '#f4f1ff')
+  : (nativeTheme.shouldUseDarkColors ? '#111b21' : '#f0f2f5'));
+
+// Motyw Aurora: jeden arkusz (assets/aurora.css) wstrzykiwany do strony i zdejmowany przy zmianie motywu
+let auroraKey = null;
+async function applyAurora() {
+  if (!win || win.isDestroyed()) return;
+  const wc = win.webContents;
+  if (settings.theme === 'aurora' && !auroraKey) {
+    try { auroraKey = await wc.insertCSS(fs.readFileSync(asset('aurora.css'), 'utf8')); } catch {}
+  } else if (settings.theme !== 'aurora' && auroraKey) {
+    const k = auroraKey; auroraKey = null;
+    try { await wc.removeInsertedCSS(k); } catch {}
+  }
+  win.setBackgroundColor(bgColor());
+}
 
 // ---------- autostart (~/.config/autostart) ----------
 function applyAutostart() {
@@ -236,9 +254,10 @@ function refreshTray() {
     photosMenuItem(toggle),
     { label: 'Motyw', submenu: [
         ['system', 'Automatyczny (jak system)'], ['light', 'Jasny'], ['dark', 'Ciemny'],
+        ['aurora', 'Aurora (jasny / ciemny)'],
       ].map(([val, label]) => ({
         label, type: 'radio', checked: settings.theme === val,
-        click: () => { settings.theme = val; nativeTheme.themeSource = val; saveSettings(); },
+        click: () => { settings.theme = val; nativeTheme.themeSource = themeSource(); saveSettings(); applyAurora(); },
       })) },
     { type: 'separator' },
     { label: 'Przeładuj', click: () => win.webContents.reload() },
@@ -319,6 +338,9 @@ function createWindow() {
 
   // klik w powiadomienie → pokaż okno (opakowujemy Notification na stronie)
   win.webContents.on('dom-ready', () => {
+    // nowy dokument (start / przeładowanie) nie ma wstrzykniętego CSS: wstaw Aurorę ponownie
+    auroraKey = null;
+    applyAurora();
     // powiadomienia: klik otwiera rozmowę, przeczytane znikają (assets/notify-hook.js)
     try {
       win.webContents.executeJavaScript(fs.readFileSync(asset('notify-hook.js'), 'utf8')).catch(() => {});

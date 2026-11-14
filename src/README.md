@@ -6,7 +6,7 @@ with its own icon, a system tray icon and an automatic light/dark theme.
 Created by: JGu  
 Supported by Claude
 
-**Version:** 1.3.5 · **License:** Freeware License (No Modifications), see `LICENSE` · **Platform:** Ubuntu (GNOME), x86_64
+**Version:** 1.3.6 · **License:** Freeware License (No Modifications), see `LICENSE` · **Platform:** Ubuntu (GNOME), x86_64
 
 > This project is not affiliated with WhatsApp or Meta. The icon is original and contains
 > no WhatsApp logo. The app loads the official `web.whatsapp.com` site, so it works as long
@@ -30,7 +30,10 @@ Supported by Claude
 - **Unread counter:** a red dot on the tray icon, the number in the tooltip and a badge on the
   dock icon (if your dock supports it).
 - **Automatic day/night theme** following the Ubuntu setting, with a manual choice in the tray
-  menu (Automatic / Light / Dark). Switching the system theme takes effect live.
+  menu (Automatic / Light / Dark / Aurora). Switching the system theme takes effect live.
+- **Aurora theme:** the shared look of the JGu Linux Apps series (lavender / deep navy, violet
+  accents, violet outgoing bubbles), light or dark following the system. It only recolours
+  WhatsApp's own colour variables, so a WhatsApp update can at most bring back some default colours.
 - **Theme-dependent icons:** the tray icon and the app icon (menu, dock, window) have a light
   and a dark variant.
 - **Resizable divider** between the chat list (left) and the conversation (right): drag the
@@ -166,6 +169,7 @@ User data: `~/.config/linux-whazzapp` (session and `settings.json`).
 
 ## Version history
 
+- **1.3.6** new **Aurora** theme (tray → Theme): lavender / deep navy with violet accents, light or dark following the system. Choosing another theme removes it instantly.
 - **1.3.5** license: the app is now published under the Freeware License (No Modifications), see `LICENSE`; free to use and share unmodified, modification is not permitted. No other changes in the app.
 - **1.3.4** fix: the stripe left behind after shrinking the chat list (the divider now moves WhatsApp's own
   divider line together with the list)

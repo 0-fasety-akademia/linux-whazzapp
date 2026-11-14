@@ -1,0 +1,55 @@
+/* linux-whazzapp: motyw „Aurora” (wspólny wygląd serii JGu Linux Apps) dla WhatsApp Web.
+   Zmieniamy WYŁĄCZNIE zmienne kolorów WhatsAppa (bez klas i układu), więc aktualizacja strony najwyżej
+   sprawi, że część elementów wróci do zwykłych kolorów — nic się nie rozjedzie.
+   Zmienne ustawiamy na każdym elemencie z !important: wygrywają tam, gdzie WhatsApp je definiuje.
+   Jasny/ciemny: WhatsApp dodaje klasę .dark do <body>, gdy system jest ciemny. */
+body:not(.dark), body:not(.dark) * {
+  --app-background: #f4f1ff !important;
+  --app-background-deeper: #e6e1fa !important;
+  --app-background-stripe: #7c5cff !important;
+  --WDS-app-wash: #ebe6ff !important;
+  --panel-background: #f3f0ff !important;
+  --panel-background-deep: #ece8fb !important;
+  --panel-header-background: #f6f3ff !important;
+  --panel-input-background: #ece8fb !important;
+  --background-default: #fbfaff !important;
+  --background-default-hover: #f1edff !important;
+  --background-default-active: #e9e3ff !important;
+  --conversation-panel-background: #f7f4ff !important;
+  --intro-background: #f7f4ff !important;
+  --navbar-background: #efeaff !important;
+  --search-input-background: #ece8fb !important;
+  --compose-input-background: #ffffff !important;
+  --outgoing-background: #e6ddff !important;
+  --incoming-background: #ffffff !important;
+  --icon-high-emphasis: #7c5cff !important;
+  --icon-primary: #7c5cff !important;
+  --unread-marker-background: #7c5cff !important;
+  --button-primary-background: #7c5cff !important;
+  --chip-button-background: #e6ddff !important;
+}
+body.dark, body.dark *, html.dark body, html.dark body * {
+  --app-background: #0c0e1a !important;
+  --app-background-deeper: #070912 !important;
+  --app-background-stripe: #2a1f55 !important;
+  --WDS-app-wash: #0a0c18 !important;
+  --panel-background: #12152a !important;
+  --panel-background-deep: #0f1224 !important;
+  --panel-header-background: #14172b !important;
+  --panel-input-background: #1a1e36 !important;
+  --background-default: #0e1020 !important;
+  --background-default-hover: #171b33 !important;
+  --background-default-active: #1e2342 !important;
+  --conversation-panel-background: #0b0d1a !important;
+  --intro-background: #0e1020 !important;
+  --navbar-background: #0e1124 !important;
+  --search-input-background: #1a1e36 !important;
+  --compose-input-background: #1a1e36 !important;
+  --outgoing-background: #3b2a75 !important;
+  --incoming-background: #1a1e36 !important;
+  --icon-high-emphasis: #22d3ee !important;
+  --icon-primary: #a855f7 !important;
+  --unread-marker-background: #a855f7 !important;
+  --button-primary-background: #8b5cf6 !important;
+  --chip-button-background: #2a2150 !important;
+}
