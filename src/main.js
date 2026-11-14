@@ -1,5 +1,5 @@
 const {
-  app, BrowserWindow, Tray, Menu, shell, session, nativeImage, nativeTheme, dialog, clipboard,
+  app, BrowserWindow, WebContentsView, Tray, Menu, shell, session, nativeImage, nativeTheme, dialog, clipboard,
 } = require('electron');
 const path = require('path');
 const fs = require('fs');
@@ -57,8 +57,8 @@ const bgColor = () => (settings.theme === 'aurora'
 // Motyw Aurora: jeden arkusz (assets/aurora.css) wstrzykiwany do strony i zdejmowany przy zmianie motywu
 let auroraKey = null;
 async function applyAurora() {
-  if (!win || win.isDestroyed()) return;
-  const wc = win.webContents;
+  if (!win || win.isDestroyed() || !view) return;
+  const wc = view.webContents;
   if (settings.theme === 'aurora' && !auroraKey) {
     try { auroraKey = await wc.insertCSS(fs.readFileSync(asset('aurora.css'), 'utf8')); } catch {}
   } else if (settings.theme !== 'aurora' && auroraKey) {
@@ -66,6 +66,42 @@ async function applyAurora() {
     try { await wc.removeInsertedCSS(k); } catch {}
   }
   win.setBackgroundColor(bgColor());
+  view.setBackgroundColor(bgColor());
+}
+
+// Aurora: własna belka okna w kolorach motywu (zwykła belka systemu zostaje biała).
+// Okno jest wtedy bez ramki systemu: u góry pasek assets/titlebar.html (przeciąganie, tytuł), przyciski okna
+// rysuje Electron (titleBarOverlay), a WhatsApp siedzi w osobnym widoku POD paskiem, więc jego układ
+// (który mierzy wysokość okna przez 100vh) się nie rozjeżdża. Ramki nie da się zmienić w otwartym oknie,
+// więc przy przełączeniu motywu tworzymy nowe okno i przenosimy do niego widok WhatsAppa (bez przeładowania).
+const TB_H = 34;
+const framed = () => settings.theme !== 'aurora';
+const overlay = () => (nativeTheme.shouldUseDarkColors
+  ? { color: '#0e1020', symbolColor: '#ecebff', height: TB_H }
+  : { color: '#f1edff', symbolColor: '#1f1a3a', height: TB_H });
+
+// ---------- ikona przy zamkniętej aplikacji ----------
+// icon-watch.sh (obok programu) podmienia ikonę w docku/menu przy zmianie jasny/ciemny, także gdy
+// aplikacja jest zamknięta. Uruchamiamy go teraz i dopisujemy do autostartu sesji (jeden na sesję: flock).
+function startIconHelper() {
+  const script = path.join(path.dirname(process.execPath), 'icon-watch.sh');
+  if (!fs.existsSync(script)) return;
+  try {
+    const dir = path.join(os.homedir(), '.config', 'autostart');
+    const file = path.join(dir, 'linux-whazzapp-icon.desktop');
+    const entry = `[Desktop Entry]
+Type=Application
+Name=linux-whazzapp icon
+Comment=Keeps the linux-whazzapp icon in step with the light/dark theme
+Exec=sh -c '[ -f "${script}" ] && exec sh "${script}"'
+NoDisplay=true
+X-GNOME-Autostart-enabled=true
+`;
+    let cur = '';
+    try { cur = fs.readFileSync(file, 'utf8'); } catch {}
+    if (cur !== entry) { fs.mkdirSync(dir, { recursive: true }); fs.writeFileSync(file, entry); }
+    require('child_process').spawn('sh', [script], { detached: true, stdio: 'ignore' }).unref();
+  } catch {}
 }
 
 // ---------- autostart (~/.config/autostart) ----------
@@ -86,9 +122,11 @@ X-GNOME-Autostart-enabled=true
 }
 
 // ---------- stan ----------
-let win = null, tray = null, quitting = false, unread = 0;
+let win = null, view = null, winFramed = true, tray = null, quitting = false, unread = 0;
 let photosApp = null, picking = false;  // wykryty linux-icloud-photos; trwa wybór zdjęć
-const startHidden = process.argv.includes('--hidden') || settings.startMinimized;
+// Ukryte okno tylko przy starcie z systemem (wpis autostartu podaje --hidden) i tylko, gdy włączone jest
+// „Startuj zminimalizowany”. Uruchomienie z menu aplikacji zawsze pokazuje okno.
+const startHidden = process.argv.includes('--hidden') && settings.startMinimized;
 const asset = (f) => path.join(__dirname, 'assets', f);
 
 if (!app.requestSingleInstanceLock()) { app.quit(); }
@@ -161,7 +199,7 @@ function photosMenuItem(toggle) {
 function syncPhotosFlag() {
   if (!win) return;
   const on = !!(photosApp && photosApp.ok && settings.photosAsk);
-  win.webContents.executeJavaScript(`window.__whazzappPhotos = ${on};`).catch(() => {});
+  view.webContents.executeJavaScript(`window.__whazzappPhotos = ${on};`).catch(() => {});
 }
 
 let lastPhotosCheck = 0;
@@ -188,7 +226,7 @@ async function onPhotosRequest() {
     buttons: ['Z iCloud Photos', 'Z komputera', 'Anuluj'], defaultId: 0, cancelId: 2, noLink: true, icon,
   });
   if (response === 1) {  // zwykłe okno plików
-    win.webContents.executeJavaScript(
+    view.webContents.executeJavaScript(
       'window.__whazzappBypass = true; window.__whazzappLastInput && window.__whazzappLastInput.click();', true,
     ).catch(() => {});
     return;
@@ -203,7 +241,7 @@ async function onPhotosRequest() {
       await photosError('Nie udało się uruchomić linux-icloud-photos.', res.detail);
     } else if (res.status === 'ok') {
       try {
-        await photos.attachFiles(win.webContents, res.files.map((f) => f.path));
+        await photos.attachFiles(view.webContents, res.files.map((f) => f.path));
       } catch (e) {
         await photosError('Nie udało się dołączyć plików do rozmowy.',
           `${e.message}\nOtwórz rozmowę, kliknij spinacz i spróbuj ponownie.`);
@@ -224,7 +262,7 @@ async function onPhotosRequest() {
 // Diagnostyka układu: kopiuje do schowka opis elementów strony (do wklejenia w zgłoszeniu błędu)
 async function layoutDiag() {
   try {
-    const text = await win.webContents.executeJavaScript(fs.readFileSync(asset('layout-diag.js'), 'utf8'));
+    const text = await view.webContents.executeJavaScript(fs.readFileSync(asset('layout-diag.js'), 'utf8'));
     clipboard.writeText(text);
     dialog.showMessageBox(win, { type: 'info', title: 'Diagnostyka układu', message: 'Skopiowano do schowka.',
       detail: 'Wklej zawartość schowka (Ctrl+V) do wiadomości z opisem problemu.' });
@@ -257,10 +295,13 @@ function refreshTray() {
         ['aurora', 'Aurora (jasny / ciemny)'],
       ].map(([val, label]) => ({
         label, type: 'radio', checked: settings.theme === val,
-        click: () => { settings.theme = val; nativeTheme.themeSource = themeSource(); saveSettings(); applyAurora(); },
+        click: () => {
+          settings.theme = val; nativeTheme.themeSource = themeSource(); saveSettings(); applyAurora();
+          if (framed() !== winFramed) rebuildWindow();
+        },
       })) },
     { type: 'separator' },
-    { label: 'Przeładuj', click: () => win.webContents.reload() },
+    { label: 'Przeładuj', click: () => view.webContents.reload() },
     { label: 'Diagnostyka układu (do schowka)', click: layoutDiag },
     { label: 'O programie', click: showAbout },
     { label: 'Zakończ', click: () => { quitting = true; app.quit(); } },
@@ -270,6 +311,8 @@ function refreshTray() {
 // zmiana motywu systemu → odśwież tło okna i ikonę w panelu
 nativeTheme.on('updated', () => {
   if (win) win.setBackgroundColor(bgColor());
+  if (view) view.setBackgroundColor(bgColor());
+  if (win && !winFramed) { try { win.setTitleBarOverlay(overlay()); } catch {} }
   refreshTray();
   applyAppIcon();
 });
@@ -308,56 +351,118 @@ function openChat({ title }) {
     })();
   `;
   // krótkie opóźnienie, żeby okno zdążyło się pokazać i WhatsApp zrobił własną obsługę
-  setTimeout(() => win.webContents.executeJavaScript(code).catch(() => {}), 250);
+  setTimeout(() => view.webContents.executeJavaScript(code).catch(() => {}), 250);
 }
 
 // ---------- okno ----------
-function createWindow() {
+// Okno: ramka systemu (motywy System/Jasny/Ciemny) albo bez ramki z belką Aurory.
+function makeWindow({ bounds, show, maximized } = {}) {
+  winFramed = framed();
   win = new BrowserWindow({
-    width: 1200, height: 800, minWidth: 700, minHeight: 500,
+    width: 1200, height: 800, minWidth: 700, minHeight: 500, ...(bounds || {}),
     show: false, autoHideMenuBar: true,
     icon: asset('icon.png'), title: 'linux-whazzapp',
     backgroundColor: bgColor(),
+    ...(winFramed ? {} : { titleBarStyle: 'hidden', titleBarOverlay: overlay() }),
+    webPreferences: { contextIsolation: true, sandbox: true, nodeIntegration: false },
+  });
+  win.removeMenu();
+  win.contentView.addChildView(view);
+  // Strona okna (assets/titlebar.html) wypełnia całe okno i podaje swój rozmiar w tytule („size:W×H”):
+  // to pewniejsze niż zdarzenia okna, które pod Waylandem przy maksymalizacji przychodzą przed zmianą
+  // rozmiaru. W ramce systemu pasek jest wyłączony (?framed) — jego obszar przeciągania działałby w całym
+  // oknie, także pod widokiem WhatsAppa, i zasłaniałby górę WhatsAppa.
+  win.loadFile(asset('titlebar.html'), winFramed ? { query: { framed: '1' } } : undefined);
+  let size = null;
+  const layout = () => {
+    if (!win || win.isDestroyed()) return;
+    const [cw, ch] = win.getContentSize();
+    const [w, h] = size || [cw, ch];
+    const top = winFramed || win.isFullScreen() ? 0 : TB_H;
+    view.setBounds({ x: 0, y: top, width: w, height: Math.max(0, h - top) });
+  };
+  layout();
+  const relayout = () => { layout(); setTimeout(layout, 120); setTimeout(layout, 400); };
+  for (const ev of ['resize', 'maximize', 'unmaximize', 'restore', 'enter-full-screen', 'leave-full-screen', 'show']) {
+    win.on(ev, relayout);
+  }
+  win.webContents.on('page-title-updated', (_e, t) => {
+    const m = /^size:(\d+)x(\d+)$/.exec(t);
+    if (m) { size = [+m[1], +m[2]]; layout(); }
+  });
+  // tytuł okna = tytuł WhatsAppa (jak dotąd), nie paska
+  win.on('page-title-updated', (e) => e.preventDefault());
+  win.setTitle(view.webContents.getTitle() || 'linux-whazzapp');
+  win.once('ready-to-show', () => {
+    if (maximized) win.maximize();
+    if (show) { win.show(); view.webContents.focus(); }
+  });
+
+  // zamknięcie → do zasobnika
+  win.on('close', (e) => {
+    if (!quitting && settings.closeToTray) { e.preventDefault(); win.hide(); }
+  });
+  win.on('focus', () => { view.webContents.focus(); refreshPhotosApp(); });
+  win.on('show', refreshTray);
+  win.on('hide', refreshTray);
+  applyAppIcon();
+}
+
+// zmiana ramki: nowe okno w tym samym miejscu, widok WhatsAppa przechodzi do niego
+function rebuildWindow() {
+  const old = win;
+  const opts = { bounds: old.getNormalBounds(), show: old.isVisible(), maximized: old.isMaximized() };
+  old.contentView.removeChildView(view);
+  makeWindow(opts);
+  old.destroy();
+}
+
+function createWindow() {
+  view = new WebContentsView({
     webPreferences: {
       partition: 'persist:whatsapp', // sesja przetrwa restart (zostajesz zalogowany)
       contextIsolation: true, sandbox: true, nodeIntegration: false,
       spellcheck: true,
     },
   });
-  win.removeMenu();
-  win.webContents.setUserAgent(CHROME_UA);
-  win.loadURL(WA_URL, { userAgent: CHROME_UA });
-
-  win.once('ready-to-show', () => { if (!startHidden) win.show(); });
+  view.setBackgroundColor(bgColor());
+  view.webContents.setUserAgent(CHROME_UA);
+  view.webContents.loadURL(WA_URL, { userAgent: CHROME_UA });
+  makeWindow({ show: !startHidden });
 
   // licznik nieprzeczytanych z tytułu: "(3) WhatsApp"
-  win.webContents.on('page-title-updated', (e, title) => {
+  view.webContents.on('page-title-updated', (e, title) => {
     const m = /^\((\d+)\)/.exec(title);
     setUnread(m ? parseInt(m[1], 10) : 0);
+    if (win && !win.isDestroyed()) win.setTitle(title);
   });
 
+  // pełny ekran z WhatsAppa (np. film) = pełny ekran okna
+  view.webContents.on('enter-html-full-screen', () => win.setFullScreen(true));
+  view.webContents.on('leave-html-full-screen', () => win.setFullScreen(false));
+
   // klik w powiadomienie → pokaż okno (opakowujemy Notification na stronie)
-  win.webContents.on('dom-ready', () => {
+  view.webContents.on('dom-ready', () => {
     // nowy dokument (start / przeładowanie) nie ma wstrzykniętego CSS: wstaw Aurorę ponownie
     auroraKey = null;
     applyAurora();
     // powiadomienia: klik otwiera rozmowę, przeczytane znikają (assets/notify-hook.js)
     try {
-      win.webContents.executeJavaScript(fs.readFileSync(asset('notify-hook.js'), 'utf8')).catch(() => {});
+      view.webContents.executeJavaScript(fs.readFileSync(asset('notify-hook.js'), 'utf8')).catch(() => {});
     } catch {}
 
     // ruchomy podział lista czatów / rozmowa (assets/resizer.js)
     try {
-      win.webContents.executeJavaScript(fs.readFileSync(asset('resizer.js'), 'utf8')).catch(() => {});
+      view.webContents.executeJavaScript(fs.readFileSync(asset('resizer.js'), 'utf8')).catch(() => {});
     } catch {}
 
     // „Zdjęcia i filmy” → wybór źródła, w tym iCloud Photos (assets/photos-hook.js)
     try {
-      win.webContents.executeJavaScript(fs.readFileSync(asset('photos-hook.js'), 'utf8'))
+      view.webContents.executeJavaScript(fs.readFileSync(asset('photos-hook.js'), 'utf8'))
         .then(syncPhotosFlag).catch(() => {});
     } catch {}
   });
-  win.webContents.on('console-message', (e, ...args) => {
+  view.webContents.on('console-message', (e, ...args) => {
     const msg = (e && typeof e.message === 'string') ? e.message
       : (typeof args[0] === 'object' && args[0] ? args[0].message : args[1]);
     if (msg === '__WHAZZAPP_PHOTOS__') { onPhotosRequest(); return; }
@@ -369,20 +474,20 @@ function createWindow() {
   });
 
   // linki zewnętrzne → przeglądarka systemowa
-  win.webContents.setWindowOpenHandler(({ url }) => {
+  view.webContents.setWindowOpenHandler(({ url }) => {
     if (/^https?:/i.test(url)) shell.openExternal(url);
     return { action: 'deny' };
   });
-  win.webContents.on('will-navigate', (e, url) => {
+  view.webContents.on('will-navigate', (e, url) => {
     if (!new URL(url).hostname.endsWith('whatsapp.com')) { e.preventDefault(); shell.openExternal(url); }
   });
 
   // menu kontekstowe (kopiuj/wklej + pisownia)
-  win.webContents.on('context-menu', (_e, p) => {
+  view.webContents.on('context-menu', (_e, p) => {
     const items = [];
     if (p.misspelledWord) {
       p.dictionarySuggestions.slice(0, 5).forEach((s) =>
-        items.push({ label: s, click: () => win.webContents.replaceMisspelling(s) }));
+        items.push({ label: s, click: () => view.webContents.replaceMisspelling(s) }));
       if (items.length) items.push({ type: 'separator' });
     }
     if (p.isEditable) items.push({ role: 'undo' }, { role: 'redo' }, { type: 'separator' }, { role: 'cut' });
@@ -391,14 +496,6 @@ function createWindow() {
     if (p.linkURL) items.push({ label: 'Otwórz link w przeglądarce', click: () => shell.openExternal(p.linkURL) });
     if (items.length) Menu.buildFromTemplate(items).popup();
   });
-
-  // zamknięcie → do zasobnika
-  win.on('close', (e) => {
-    if (!quitting && settings.closeToTray) { e.preventDefault(); win.hide(); }
-  });
-  win.on('focus', () => refreshPhotosApp());
-  win.on('show', refreshTray);
-  win.on('hide', refreshTray);
 }
 
 // ---------- start ----------
@@ -418,6 +515,7 @@ app.whenReady().then(() => {
   buildTray();
   applyAppIcon();
   applyAutostart();
+  startIconHelper();
   app.on('activate', showWindow);
 });
 

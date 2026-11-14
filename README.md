@@ -6,7 +6,7 @@ with its own icon, a system tray icon and an automatic light/dark theme.
 Created by: JGu  
 Supported by Claude
 
-**Version:** 1.3.7 · **License:** Freeware License (No Modifications), see `LICENSE` · **Platform:** Ubuntu (GNOME), x86_64
+**Version:** 1.3.10 · **License:** Freeware License (No Modifications), see `LICENSE` · **Platform:** Ubuntu (GNOME), x86_64
 
 > This project is not affiliated with WhatsApp or Meta. The icon is original and contains
 > no WhatsApp logo. The app loads the official `web.whatsapp.com` site, so it works as long
@@ -41,7 +41,8 @@ Supported by Claude
   the default. In very narrow windows (below 760 px, when WhatsApp switches to a single
   column) the divider switches itself off.
 - **About** in the tray menu: version and author credit.
-- **Autostart** with the system (optional, hidden in the tray).
+- **Autostart** with the system (optional; with *start minimized* it stays in the tray).
+  Opening the app from the app menu always shows the window.
 - Spell checking PL/EN, context menu, links open in the system browser.
 - Single instance, session remembered between runs, camera and microphone for calls.
 
@@ -105,10 +106,15 @@ itself is fine (`dpkg-deb -I dist/linux-whazzapp_<version>_amd64.deb`).
 - By default the theme follows the system (Settings → Appearance). Manually: tray → Theme.
 - In WhatsApp itself (Settings → Theme) choose "System default", otherwise the site ignores
   the app theme.
-- Tray icon: a dark bubble with a light green handset on a dark panel, a white bubble on a
-  light one. A red dot is added when there are unread messages.
-- The app icon is swapped in `~/.local/share/icons/hicolor/512x512/apps/linux-whazzapp.png`.
+- Icons in the Aurora style of the series: a chat bubble with double "read" ticks on a green → cyan →
+  violet tile (light), or a gradient bubble on a deep navy tile (dark). The tray icon is the same,
+  with a pink dot when there are unread messages.
+- The app icon is swapped in `~/.local/share/icons/hicolor/512x512/apps/linux-whazzapp.png`, also
+  while the app is closed: the app starts the small helper `/opt/linux-whazzapp/icon-watch.sh`
+  and adds it to the session autostart (`~/.config/autostart/linux-whazzapp-icon.desktop`).
   The application menu (Activities) may refresh it only after a while or after you log in again.
+- **Aurora title bar:** in Aurora the window has its own title bar in the theme colours (the system
+  one stays white); WhatsApp sits in a separate view below it. Other themes keep the system bar.
 - Icon sources: `assets/icon.svg`, `assets/icon-dark.svg`, `assets/tray-*.svg`.
 
 ## Integration with linux-icloud-photos
@@ -156,6 +162,8 @@ Paths relative to `src/`:
 ```
 main.js                logic of the app (window, tray, notifications, theme, about)
 assets/                app and tray icons (SVG + PNG, light and dark variants)
+assets/titlebar.html   the window's own page: Aurora title bar, reports the window size
+packaging/icon-watch.sh  keeps the dock icon light/dark while the app is closed
 assets/notify-hook.js  notifications: click opens the chat, read ones disappear
 assets/photos-hook.js  intercepts "Photos & videos" in the attach menu
 assets/resizer.js      resizable chat list / conversation divider (injected into the page)
@@ -169,6 +177,7 @@ User data: `~/.config/linux-whazzapp` (session and `settings.json`).
 
 ## Version history
 
+- **1.3.10** Aurora title bar: in Aurora the window gets its own bar in the theme colours instead of the white system one (WhatsApp now lives in a separate view under it, and fills the window correctly when maximised). New light / dark icons in the Aurora style of the series; the dock icon follows the theme also while the app is closed. *Start minimized* now applies only to autostart: opening the app from the menu always shows the window.
 - **1.3.7** Aurora now actually recolours WhatsApp: it targets the colour tokens of WhatsApp's current design (`--WDS-*`); 1.3.6 used older names that WhatsApp no longer has. Light/dark follows the system, so set WhatsApp's own theme (Settings → Theme) to *System default*.
 - **1.3.6** new **Aurora** theme (tray → Theme): lavender / deep navy with violet accents, light or dark following the system. Choosing another theme removes it instantly.
 - **1.3.5** license: the app is now published under the Freeware License (No Modifications), see `LICENSE`; free to use and share unmodified, modification is not permitted. No other changes in the app.

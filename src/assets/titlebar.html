@@ -1,0 +1,27 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'">
+<title>linux-whazzapp</title>
+<style>
+  /* Aurora title bar: drag strip above WhatsApp; the window buttons on the right are Electron's overlay.
+     Only the 34 px bar may be a drag region: drag regions apply to the whole window, also under the
+     WhatsApp view, so a drag area any taller would swallow every click in WhatsApp. */
+  html, body { margin: 0; height: 100%; overflow: hidden; }
+  body { background: #f1edff; color: #1f1a3a; user-select: none; cursor: default;
+         font: 600 13px Ubuntu, "Noto Sans", sans-serif; }
+  .bar { -webkit-app-region: drag; height: 34px; display: flex; align-items: center; justify-content: center; box-sizing: border-box;
+         border-bottom: 1px solid #e2dcfa; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #0e1020; color: #ecebff; }
+    .bar { border-bottom-color: #252a45; }
+  }
+</style></head>
+<body><div class="bar">Linux WhazzApp</div>
+<script>
+  // System frame: no bar (and so no drag region) at all
+  if (new URLSearchParams(location.search).has('framed')) document.querySelector('.bar').remove();
+  // Report the real size of the window's content to the main process (it lays out the WhatsApp view)
+  const report = () => { document.title = 'size:' + innerWidth + 'x' + innerHeight; };
+  addEventListener('resize', report);
+  report();
+</script></body></html>
