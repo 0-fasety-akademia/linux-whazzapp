@@ -6,7 +6,7 @@ with its own icon, a system tray icon and an automatic light/dark theme.
 Created by: JGu  
 Supported by Claude
 
-**Version:** 1.3.10 · **License:** Freeware License (No Modifications), see `LICENSE` · **Platform:** Ubuntu (GNOME), x86_64
+**Version:** 1.3.11 · **License:** Freeware License (No Modifications), see `LICENSE` · **Platform:** Ubuntu (GNOME), x86_64
 
 > This project is not affiliated with WhatsApp or Meta. The icon is original and contains
 > no WhatsApp logo. The app loads the official `web.whatsapp.com` site, so it works as long
@@ -177,6 +177,7 @@ User data: `~/.config/linux-whazzapp` (session and `settings.json`).
 
 ## Version history
 
+- **1.3.11** packaging fix: the 1.3.10 package left the app icons (`assets/icon.png`, `assets/icon-dark.png`) out of the app, so the window had no icon and the app could not switch the dock icon itself. No other changes.
 - **1.3.10** Aurora title bar: in Aurora the window gets its own bar in the theme colours instead of the white system one (WhatsApp now lives in a separate view under it, and fills the window correctly when maximised). New light / dark icons in the Aurora style of the series; the dock icon follows the theme also while the app is closed. *Start minimized* now applies only to autostart: opening the app from the menu always shows the window.
 - **1.3.7** Aurora now actually recolours WhatsApp: it targets the colour tokens of WhatsApp's current design (`--WDS-*`); 1.3.6 used older names that WhatsApp no longer has. Light/dark follows the system, so set WhatsApp's own theme (Settings → Theme) to *System default*.
 - **1.3.6** new **Aurora** theme (tray → Theme): lavender / deep navy with violet accents, light or dark following the system. Choosing another theme removes it instantly.

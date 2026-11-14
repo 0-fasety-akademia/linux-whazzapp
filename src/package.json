@@ -1,7 +1,7 @@
 {
   "name": "linux-whazzapp",
   "productName": "linux-whazzapp",
-  "version": "1.3.10",
+  "version": "1.3.11",
   "description": "Lekki klient WhatsApp Web dla Ubuntu: tray, powiadomienia, autostart, motyw jasny/ciemny",
   "main": "main.js",
   "desktopName": "linux-whazzapp.desktop",
@@ -69,11 +69,11 @@
         "to": "icon-watch.sh"
       },
       {
-        "from": "assets/icon.png",
+        "from": "packaging/icons/icon.png",
         "to": "icons/icon.png"
       },
       {
-        "from": "assets/icon-dark.png",
+        "from": "packaging/icons/icon-dark.png",
         "to": "icons/icon-dark.png"
       }
     ]
